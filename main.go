@@ -2,6 +2,9 @@ package main
 
 import (
 	"context"
+	"fmt"
+
+	"latihan-mongo/db"
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
@@ -40,7 +43,7 @@ func Get(c *gin.Context) {
 		return
 	}
 
-	var data []map[string]interface
+	var data []map[string]interface{}
 	result.All(context.Background(), &data)
 
 	c.JSON(200, data)
@@ -48,8 +51,9 @@ func Get(c *gin.Context) {
 
 func GetByID(c *gin.Context) {
 	id := c.Param("id")
-
+	fmt.Println(id)
 	client, err := db.Mongodb()
+
 	if err != nil {
 		c.String(500, err.Error())
 		return
@@ -60,8 +64,8 @@ func GetByID(c *gin.Context) {
 		c.String(500, err.Error())
 		return
 	}
-
-	var data map[string]interface{}
+	fmt.Println(result)
+	var data []map[string]interface{}
 	result.All(context.Background(), &data)
 
 	c.JSON(200, data)
@@ -87,6 +91,8 @@ func Create(c *gin.Context) {
 }
 
 func Update(c *gin.Context) {
+	username := c.Param("id")
+
 	var user User
 	c.BindJSON(&user)
 
@@ -96,7 +102,7 @@ func Update(c *gin.Context) {
 		return
 	}
 
-	_, err = client.Database("user").Collection("user").UpdateOne(context.Background(), bson.M{"username": user.Username}, bson.M{"$set" : user})
+	_, err = client.Database("user").Collection("user").UpdateOne(context.Background(), bson.M{"username": username}, bson.M{"$set": user})
 	if err != nil {
 		c.String(500, err.Error())
 		return
